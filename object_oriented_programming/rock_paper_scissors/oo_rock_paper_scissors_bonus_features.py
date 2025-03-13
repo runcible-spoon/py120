@@ -1,7 +1,36 @@
 import random
 
+class Move:
+    def __init__(self):
+        self.move = None
+
+class Rock(Move):
+    def __init__(self):
+        super().__init__()
+        self.move = 'rock'
+
+class Paper(Move):
+    def __init__(self):
+        super().__init__()
+        self.move = 'paper'
+
+class Scissors(Move):
+    def __init__(self):
+        super().__init__()
+        self.move = 'scissors'
+
+class Lizard(Move):
+    def __init__(self):
+        super().__init__()
+        self.move = 'lizard'
+
+class Spock(Move):
+    def __init__(self):
+        super().__init__()
+        self.move = 'spock'
+
 class Player:
-    CHOICES = ('rock', 'paper', 'scissors', 'lizard', 'spock')
+    CHOICES = (Rock().move, Paper().move, Scissors().move, Lizard().move, Spock().move)
     WINNING_SCORE = 5
 
     def __init__(self):
@@ -35,6 +64,7 @@ class Human(Player):
             print(f"Sorry, {choice} is not valid.")
 
         self.move = choice
+
 
 class RPSGame:
     WINNING_COMBINATIONS = {
