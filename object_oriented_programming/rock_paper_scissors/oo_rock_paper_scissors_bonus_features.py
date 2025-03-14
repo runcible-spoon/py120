@@ -1,41 +1,12 @@
 import random
-
-class Move:
-    def __init__(self):
-        self.move = None
-
-class Rock(Move):
-    def __init__(self):
-        super().__init__()
-        self.move = 'rock'
-
-class Paper(Move):
-    def __init__(self):
-        super().__init__()
-        self.move = 'paper'
-
-class Scissors(Move):
-    def __init__(self):
-        super().__init__()
-        self.move = 'scissors'
-
-class Lizard(Move):
-    def __init__(self):
-        super().__init__()
-        self.move = 'lizard'
-
-class Spock(Move):
-    def __init__(self):
-        super().__init__()
-        self.move = 'spock'
+from pprint import pp
 
 class Player:
-    CHOICES = (Rock().move, Paper().move, Scissors().move, Lizard().move, Spock().move)
+    CHOICES = ('rock', 'paper', 'scissors', 'lizard', 'spock')
     WINNING_SCORE = 5
 
     def __init__(self):
         self.move = None
-        # needs a self.score?
 
     def wins_game(self):
         return self.score == self.WINNING_SCORE
@@ -43,6 +14,7 @@ class Player:
 class Computer(Player):
     def __init__(self):
         super().__init__()
+        self.name = "Computer"
         self.score = 0
 
     def choose(self):
@@ -51,6 +23,7 @@ class Computer(Player):
 class Human(Player):
     def __init__(self):
         self.move = None
+        self.name = "You"
         self.score = 0
 
     def choose(self):
@@ -58,13 +31,13 @@ class Human(Player):
 
         while True:
             choice = input(prompt).lower()
+
             if choice.lower() in Player.CHOICES:
                 break
 
             print(f"Sorry, {choice} is not valid.")
 
         self.move = choice
-
 
 class RPSGame:
     WINNING_COMBINATIONS = {
@@ -78,8 +51,18 @@ class RPSGame:
     def __init__(self):
         self._human = Human()
         self._computer = Computer()
+        self._history = []
 
-    def _reset_scores(self):
+        self._game = 0
+        self._round = 0
+
+    def _current_game(self):
+        return f"Game {self._game}"
+
+    def _current_round(self):
+        return f"Round {self._round}"
+
+    def _reset(self):
         self._human.score = self._computer.score = 0
 
     def _display_welcome_message(self):
@@ -127,15 +110,23 @@ class RPSGame:
         elif self._computer.wins_game():
             print("Computer wins the game!")
 
+    def _display_history(self):
+        print(f"Game history:")
+        pp(self._history)
+
     def play(self):
         self._display_welcome_message()
 
         while True:
-            self._reset_scores()
+            self._game += 1
+            self._history.append(self._current_game())
+            self._reset()
 
             while True:
+                self._round += 1
                 self._human.choose()
                 self._computer.choose()
+                self._history.append([self._current_round(), f"You: {self._human.move}", f"Computer: {self._computer.move}"])
                 self._display_round_winner()
                 self._increment_score()
                 self._display_score()
@@ -145,7 +136,7 @@ class RPSGame:
             self._display_game_winner()
             if not self._play_again():
                 break
-
+        self._display_history()
         self._display_goodbye_message()
 
     def _play_again(self):
