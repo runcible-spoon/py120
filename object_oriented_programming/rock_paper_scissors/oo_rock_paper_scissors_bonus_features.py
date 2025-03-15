@@ -1,8 +1,4 @@
-# TODO add total wins count?
-# TODO get Winner dictionary update to work
-
 import random
-from pprint import pp
 import os
 
 class Player:
@@ -12,6 +8,7 @@ class Player:
 
     def __init__(self):
         self.move = None
+        self.score = 0
 
     def wins_game(self):
         return self.score == self.WINNING_SCORE
@@ -43,13 +40,12 @@ class HAL(Computer):
         self.move = random.choice(self.HAL_MOVES)
 
 class Daneel(Computer):
-    # first move random, then always chooses what you chose in the previous match
+    # first move random, then always chooses
+    # what you chose in the previous match
     def __init__(self):
         super().__init__()
 
     def choose(self):
-        # TODO pull game, match methods out into subclass of RPSGame so not referencing
-        # instance of RPSGame outside of definitions
         if new_game.match_() == 1:
             self.move = random.choice(Player.MOVES)
         else:
@@ -57,6 +53,7 @@ class Daneel(Computer):
 
 class Human(Player):
     def __init__(self):
+        super().__init__()
         self.move = None
         self.opponent = None
         self.score = 0
@@ -65,10 +62,12 @@ class Human(Player):
 
         match choice_type:
             case 'robot':
-                prompt = "Please select an opponent: R2D2, HAL, Daneel, or Asimo: "
+                prompt = "Please select an opponent: \
+R2D2, HAL, Daneel, or Asimo: "
                 options = Player.ROBOTS
             case 'move':
-                prompt = "Please choose rock, paper, or scissors, lizard, or spock: "
+                prompt = "Please choose rock, paper, or \
+scissors, lizard, or spock: "
                 options = Player.MOVES
 
         while True:
@@ -185,9 +184,11 @@ class RPSGame:
             print("It's a tie!")
 
     def _display_score(self):
-        print(f"\n"
-              f"Scores: \n"
-              f"    Player: {self._human.score} | {self._human.opponent_name()}: {self._computer.score}\n")
+        print("\n"
+"Scores: \n"
+f"    Player: {self._human.score} | \
+{self._human.opponent_name()}: \
+{self._computer.score}\n")
 
     def _display_game_winner(self):
         if self._human.wins_game():
@@ -196,15 +197,19 @@ class RPSGame:
             print(f"{self._human.opponent_name()} wins the game!")
 
     def humans_last_move(self):
-        return self._history[self._current_game()][self._previous_match()]['You']
+        game = self._current_game()
+        prev_match = self._previous_match()
+        return self._history[game][prev_match]['You']
 
     def _display_match_turns(self):
+        game = self._current_game()
         if self.match_() > 1:
-            print(f"{self._current_game()}:")
-            for match in self._history[self._current_game()]:
+            print(f"{game}:")
+            for match in self._history[game]:
                 print(f"    {match}:")
-                for player in  self._history[self._current_game()][match]:
-                    print(f"        {player} chose {self._history[self._current_game()][match][player]}")
+                for player in self._history[game][match]:
+                    print(f"        {player} chose \
+{self._history[game][match][player]}")
 
     def _display_history(self):
         print("\n"
@@ -218,9 +223,8 @@ class RPSGame:
                 print(f"    {match}:")
 
                 for player in  self._history[game][match]:
-                    print(f"        {player} chose {self._history[game][match][player]}")
-
-            # print(f"Winner: {self._history[game]['Winner']}")
+                    print(f"        {player} chose \
+{self._history[game][match][player]}")
 
     def play(self):
         self._display_welcome_message()
@@ -249,8 +253,10 @@ class RPSGame:
                 self._computer.choose()
 
                 # log moves
-                self._history[self._current_game()][self._current_match()] = {'You': self._human.move,
-                                                                              f'{self._human.opponent_name()}': self._computer.move}
+                game = self._current_game()
+                match_ = self._current_match()
+                self._history[game][match_] = {'You': self._human.move,
+                f'{self._human.opponent_name()}': self._computer.move}
 
                 # match outcome, history of current game
                 self._display_match_winner()
@@ -258,11 +264,7 @@ class RPSGame:
                 self._display_score()
                 self._display_match_turns()
 
-                if self._human.wins_game():
-                    # self._history[self._current_game()]['Winner'] = 'You'
-                    break
-                elif self._computer.wins_game():
-                    # self._history[self._current_game()]['Winner'] = self._human.opponent_name()
+                if self._human.wins_game()or self._computer.wins_game():
                     break
 
             # game outcome
