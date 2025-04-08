@@ -28,7 +28,7 @@ class Square:
 
 class Board:
     def __init__(self):
-        self.squares = {key: Square() for key in range(1, 10)}
+        self.wipe()
 
     def display(self):
         print()
@@ -66,6 +66,9 @@ class Board:
         markers = [self.squares[key].marker for key in keys]
         return markers.count(player.marker)
 
+    def wipe(self):
+        self.squares = {key: Square() for key in range(1, 10)}
+
     def display_with_clear(self):
         clear_screen()
         print("\n")
@@ -102,6 +105,16 @@ class TTTGame:
 
     def play(self):
         self.display_welcome_message()
+
+        while True:
+            self.play_one_round()
+            if not self.play_again():
+                break
+
+        self.display_goodbye_message()
+
+    def play_one_round(self):
+        self.board.wipe()
         self.board.display()
 
         while True:
@@ -117,7 +130,6 @@ class TTTGame:
 
         self.board.display_with_clear()
         self.display_results()
-        self.display_goodbye_message()
 
     def display_welcome_message(self):
         clear_screen()
@@ -135,12 +147,25 @@ class TTTGame:
         else:
             print("A tie game. How boring.")
 
+    @staticmethod
+    def _join_or(sequence, delimiter=', ', conjunction='or'):
+        match len(sequence):
+            case 0:
+                return ''
+            case 1:
+                return str(sequence[0])
+            case 2:
+                return f"{sequence[0]} {conjunction} {sequence[1]}"
+
+        leading_items = delimiter.join(str(item) for item in sequence[0:-1])
+        return f'{leading_items}{delimiter}{conjunction} {sequence[-1]}'
+
     def human_moves(self):
         choice = None
         valid_choices = self.board.unused_squares()
         while True:
             choices_list = [str(choice) for choice in valid_choices]
-            choices_str = ", ".join(choices_list)
+            choices_str = self._join_or(choices_list)
             prompt = f"Choose a square ({choices_str}): "
             choice = input(prompt)
 
@@ -177,6 +202,17 @@ class TTTGame:
                 return True
 
         return False
+
+    def play_again(self):
+        while True:
+            choice = input("Play again? 'y' or 'n': ").lower().strip()
+            if choice in ('y', 'n'):
+                break
+
+            print("Sorry, that's not a valid choice.")
+            print()
+
+        return choice == 'y'
 
 game = TTTGame()
 game.play()
