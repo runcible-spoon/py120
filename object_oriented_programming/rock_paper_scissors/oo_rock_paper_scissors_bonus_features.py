@@ -28,7 +28,6 @@ class Player:
 
 class Computer(Player):
     # chooses randomly
-
     def choose_move(self):
         self.move = random.choice(list(Player.MOVES.values()))
 
@@ -94,11 +93,7 @@ R2D2, HAL, Daneel, or Asimo: "
     def opponent_name(self):
         return self.opponent.title()
 
-    def last_move(self):
-        game = RPSGame._current_game()
-        prev_match = RPSGame._previous_match()
 
-        return RPSGame._history[game][prev_match]['You']
 
 class RPSGame:
     WINNING_COMBINATIONS = {
@@ -164,7 +159,7 @@ class RPSGame:
             case 'hal':
                 self._computer = HAL()
             case 'daneel':
-                self._computer = Daneel()
+                self._computer = Daneel(self)
             case 'asimo':
                 self._computer = Computer()
         print(f"{self._human.opponent_name()} is your opponent.")
@@ -237,6 +232,12 @@ f"    Player: {self._human.score} | \
                     print(f"        {player} chose \
 {self._history[game][match][player]}")
 
+    def last_move(self):
+        game = self._current_game()
+        prev_match = self._previous_match()
+
+        return self._history[game][prev_match]['You']
+
     def display_history(self):
         print("\n"
               "GAME HISTORY:\n"
@@ -276,22 +277,18 @@ f"    Player: {self._human.score} | \
                 break
 
         # display history of all games, goodbye message
-        self._display_history()
+        self.display_history()
         self._display_goodbye_message()
 
     def _play_again(self):
-        options = ('y', 'n')
         while True:
+            options = ('y', 'n')
             answer = input("Would you like to play again? (y/n): ")
-
-            if answer.lower() not in options:
+            if answer.lower() in options:
                 break
 
             print("Sorry, not a valid choice.")
 
         return answer.lower().startswith('y')
-
-class History:
-
 
 RPSGame().play()
