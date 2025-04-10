@@ -74,6 +74,9 @@ class Board:
         print("\n")
         self.display()
 
+    def is_unused_square(self, key):
+        return self.squares[key].is_unused()
+
 class Player:
     def __init__(self, marker):
         self.marker = marker
@@ -182,9 +185,38 @@ class TTTGame:
         self.board.mark_square_at(choice, self.human.marker)
 
     def computer_moves(self):
-        valid_choices = self.board.unused_squares()
-        choice = random.choice(valid_choices)
+        choice = self.offensive_computer_move()
+        if not choice:
+            choice = self.defensive_computer_move()
+        if not choice:
+            choice = self.pick_center_square()
+        if not choice:
+            choice = self.pick_random_square()
+
         self.board.mark_square_at(choice, self.computer.marker)
+
+    def find_critical_square(self, player):
+        for row in TTTGame.POSSIBLE_WINNING_ROWS:
+            key = self.critical_square(row, player)
+            if key:
+                return key
+
+        return None
+
+    def critical_square(self, row, player):
+        if self.board.count_markers_for(player, row) == 2:
+            for key in row:
+                if self.board.is_unused_square(key):
+                    return key
+
+        return None
+
+    def pick_center_square(self):
+        return 5 if self.board.is_unused_square(5) else None
+
+    def pick_random_square(self):
+        valid_choices = self.board.unused_squares()
+        return random.choice(valid_choices)
 
     def is_game_over(self):
         return self.board.is_full() or self.someone_won()
