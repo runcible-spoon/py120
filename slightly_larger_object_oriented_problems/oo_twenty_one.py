@@ -146,12 +146,6 @@ class Dealer(Participant):
 
 
 class TwentyOneGame:
-    PLAYER_TURN = 'PLAYER_TURN'
-    DEALER_TURN = 'DEALER_TURN'
-
-    PLAYER_WINS = 'PLAYER_WINS'
-    DEALER_WINS = 'DEALER_WINS'
-
     def __init__(self):
         self.player = Player()
         self.dealer = Dealer()
